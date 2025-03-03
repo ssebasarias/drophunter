@@ -7,13 +7,15 @@ type ChipProps = {
   variant?: "default" | "outline" | "secondary" | "primary";
   size?: "sm" | "md" | "lg";
   className?: string;
+  onClick?: () => void;
 };
 
 const Chip = ({ 
   label, 
   variant = "default", 
   size = "md", 
-  className 
+  className,
+  onClick
 }: ChipProps) => {
   const variants = {
     default: "bg-secondary text-secondary-foreground",
@@ -34,8 +36,10 @@ const Chip = ({
         "inline-flex items-center font-medium transition-colors",
         variants[variant],
         sizes[size],
+        onClick ? "cursor-pointer" : "",
         className
       )}
+      onClick={onClick}
     >
       {label}
     </span>

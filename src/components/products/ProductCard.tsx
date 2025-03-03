@@ -25,13 +25,15 @@ type ProductCardProps = {
   isFavorite?: boolean;
   onToggleFavorite?: (id: string) => void;
   className?: string;
+  style?: React.CSSProperties;
 };
 
 const ProductCard = ({ 
   product, 
   isFavorite = false, 
   onToggleFavorite,
-  className 
+  className,
+  style
 }: ProductCardProps) => {
   const {
     id,
@@ -68,6 +70,7 @@ const ProductCard = ({
         "group relative flex flex-col overflow-hidden rounded-lg border bg-card hover-lift",
         className
       )}
+      style={style}
     >
       <div className="relative h-[200px] overflow-hidden">
         <img 
