@@ -8,7 +8,6 @@ import { AuthProvider } from "./contexts/AuthContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Dashboard from "./pages/Dashboard";
 import Categories from "./pages/Categories";
 import CategoryPage from "./pages/CategoryPage";
 import Favorites from "./pages/Favorites";
@@ -30,8 +29,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/categories" element={<Categories />} />
+            <Route path="/dashboard" element={<Categories />} />
+            <Route path="/categories" element={<Navigate to="/dashboard" />} />
             <Route path="/categories/:categoryId" element={<CategoryPage />} />
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/product/:id" element={<ProductDetails />} />

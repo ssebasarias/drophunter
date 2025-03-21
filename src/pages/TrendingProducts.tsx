@@ -49,16 +49,15 @@ const TrendingProducts = () => {
               <p className="text-muted-foreground">Discover fast-growing products to boost your sales</p>
             </div>
             
-            <Tabs defaultValue="all" className="mb-8">
+            <Tabs value={activeCategory} onValueChange={setActiveCategory} defaultValue="all" className="mb-8">
               <TabsList className="mb-6">
-                <TabsTrigger value="all" onClick={() => setActiveCategory("all")}>
+                <TabsTrigger value="all">
                   All Categories
                 </TabsTrigger>
                 {categories.map(category => (
                   <TabsTrigger 
                     key={category.id} 
                     value={category.id}
-                    onClick={() => setActiveCategory(category.id)}
                   >
                     {category.name}
                   </TabsTrigger>
@@ -67,14 +66,20 @@ const TrendingProducts = () => {
               
               <TabsContent value={activeCategory} className="mt-0">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {trendingProducts.map((product, index) => (
-                    <TrendingProductCard
-                      key={product.id}
-                      product={product}
-                      className="opacity-0 animate-fade-in"
-                      style={{ animationDelay: `${index * 0.1}s` }}
-                    />
-                  ))}
+                  {trendingProducts.length > 0 ? (
+                    trendingProducts.map((product, index) => (
+                      <TrendingProductCard
+                        key={product.id}
+                        product={product}
+                        className="opacity-0 animate-fade-in"
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                      />
+                    ))
+                  ) : (
+                    <div className="col-span-full text-center py-10">
+                      <p className="text-muted-foreground">No trending products found in this category.</p>
+                    </div>
+                  )}
                 </div>
               </TabsContent>
             </Tabs>

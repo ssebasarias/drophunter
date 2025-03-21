@@ -51,7 +51,7 @@ const Categories = () => {
   
   const handleCategoryChange = (category: string) => {
     if (category === "all") {
-      navigate("/categories");
+      navigate("/dashboard");
     } else {
       navigate(`/categories/${category}`);
     }
@@ -90,7 +90,7 @@ const Categories = () => {
   return (
     <>
       <Helmet>
-        <title>Product Categories - DropHunter</title>
+        <title>Dashboard - DropHunter</title>
       </Helmet>
       
       <Navbar />
@@ -102,8 +102,8 @@ const Categories = () => {
           <div className="container py-8">
             <div className="flex flex-col gap-3 md:flex-row md:items-center justify-between mb-8">
               <div>
-                <h1 className="text-3xl font-medium tracking-tight">Categories</h1>
-                <p className="text-muted-foreground">Browse products by category</p>
+                <h1 className="text-3xl font-medium tracking-tight">Dashboard</h1>
+                <p className="text-muted-foreground">Explore products by category</p>
               </div>
               
               <div className="flex items-center gap-3">
