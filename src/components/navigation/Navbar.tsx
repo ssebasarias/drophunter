@@ -10,7 +10,8 @@ import {
   Heart,
   LogOut,
   LogIn,
-  UserPlus
+  UserPlus,
+  TrendingUp
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -58,36 +59,50 @@ const Navbar = () => {
             </Link>
             
             <nav className="hidden md:flex items-center gap-6">
-              <Link 
-                to="/dashboard" 
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
-                  location.pathname === "/dashboard" ? "text-primary" : "text-muted-foreground"
-                )}
-              >
-                Dashboard
-              </Link>
-              <Link 
-                to="/categories" 
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
-                  location.pathname === "/categories" || location.pathname.startsWith("/categories/") 
-                    ? "text-primary" 
-                    : "text-muted-foreground"
-                )}
-              >
-                Categories
-              </Link>
               {isLoggedIn && (
-                <Link 
-                  to="/favorites" 
-                  className={cn(
-                    "text-sm font-medium transition-colors hover:text-primary",
-                    location.pathname === "/favorites" ? "text-primary" : "text-muted-foreground"
-                  )}
-                >
-                  Favorites
-                </Link>
+                <>
+                  <Link 
+                    to="/dashboard" 
+                    className={cn(
+                      "text-sm font-medium transition-colors hover:text-primary",
+                      location.pathname === "/dashboard" ? "text-primary" : "text-muted-foreground"
+                    )}
+                  >
+                    Dashboard
+                  </Link>
+                  <Link 
+                    to="/categories" 
+                    className={cn(
+                      "text-sm font-medium transition-colors hover:text-primary",
+                      location.pathname === "/categories" || location.pathname.startsWith("/categories/") 
+                        ? "text-primary" 
+                        : "text-muted-foreground"
+                    )}
+                  >
+                    Categories
+                  </Link>
+                  <Link 
+                    to="/trending" 
+                    className={cn(
+                      "text-sm font-medium transition-colors hover:text-primary",
+                      location.pathname === "/trending" ? "text-primary" : "text-muted-foreground"
+                    )}
+                  >
+                    <span className="flex items-center">
+                      <TrendingUp className="h-4 w-4 mr-1" />
+                      Trending
+                    </span>
+                  </Link>
+                  <Link 
+                    to="/favorites" 
+                    className={cn(
+                      "text-sm font-medium transition-colors hover:text-primary",
+                      location.pathname === "/favorites" ? "text-primary" : "text-muted-foreground"
+                    )}
+                  >
+                    Favorites
+                  </Link>
+                </>
               )}
             </nav>
           </div>
@@ -225,42 +240,76 @@ const Navbar = () => {
         <div className="fixed inset-0 top-16 z-50 bg-background animate-fade-in md:hidden">
           <div className="container py-6">
             <nav className="flex flex-col gap-6">
-              <Link 
-                to="/dashboard" 
-                className={cn(
-                  "text-lg font-medium transition-colors hover:text-primary",
-                  location.pathname === "/dashboard" ? "text-primary" : "text-foreground"
-                )}
-                onClick={closeMenu}
-              >
-                Dashboard
-              </Link>
-              <Link 
-                to="/categories" 
-                className={cn(
-                  "text-lg font-medium transition-colors hover:text-primary",
-                  location.pathname === "/categories" || location.pathname.startsWith("/categories/") 
-                    ? "text-primary" 
-                    : "text-foreground"
-                )}
-                onClick={closeMenu}
-              >
-                Categories
-              </Link>
-              {isLoggedIn && (
-                <Link 
-                  to="/favorites" 
-                  className={cn(
-                    "text-lg font-medium transition-colors hover:text-primary",
-                    location.pathname === "/favorites" ? "text-primary" : "text-foreground"
-                  )}
-                  onClick={closeMenu}
-                >
-                  Favorites
-                </Link>
+              {isLoggedIn ? (
+                <>
+                  <Link 
+                    to="/dashboard" 
+                    className={cn(
+                      "text-lg font-medium transition-colors hover:text-primary",
+                      location.pathname === "/dashboard" ? "text-primary" : "text-foreground"
+                    )}
+                    onClick={closeMenu}
+                  >
+                    Dashboard
+                  </Link>
+                  <Link 
+                    to="/categories" 
+                    className={cn(
+                      "text-lg font-medium transition-colors hover:text-primary",
+                      location.pathname === "/categories" || location.pathname.startsWith("/categories/") 
+                        ? "text-primary" 
+                        : "text-foreground"
+                    )}
+                    onClick={closeMenu}
+                  >
+                    Categories
+                  </Link>
+                  <Link 
+                    to="/trending" 
+                    className={cn(
+                      "text-lg font-medium transition-colors hover:text-primary",
+                      location.pathname === "/trending" ? "text-primary" : "text-foreground"
+                    )}
+                    onClick={closeMenu}
+                  >
+                    <span className="flex items-center">
+                      <TrendingUp className="h-5 w-5 mr-2" />
+                      Trending Products
+                    </span>
+                  </Link>
+                  <Link 
+                    to="/favorites" 
+                    className={cn(
+                      "text-lg font-medium transition-colors hover:text-primary",
+                      location.pathname === "/favorites" ? "text-primary" : "text-foreground"
+                    )}
+                    onClick={closeMenu}
+                  >
+                    Favorites
+                  </Link>
+                </>
+              ) : (
+                <div className="flex flex-col gap-4 items-center justify-center py-8">
+                  <div className="text-center mb-4">
+                    <h3 className="text-xl font-medium mb-2">Welcome to DropHunter</h3>
+                    <p className="text-muted-foreground">Please log in to access all features</p>
+                  </div>
+                  <Button className="w-full" asChild>
+                    <Link to="/login" onClick={closeMenu}>
+                      <LogIn className="mr-2 h-4 w-4" />
+                      Login
+                    </Link>
+                  </Button>
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link to="/register" onClick={closeMenu}>
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      Register
+                    </Link>
+                  </Button>
+                </div>
               )}
               
-              {isLoggedIn ? (
+              {isLoggedIn && (
                 <div className="pt-6 border-t">
                   <div className="flex items-center gap-4 mb-4">
                     <img 
@@ -287,21 +336,6 @@ const Navbar = () => {
                   >
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
-                  </Button>
-                </div>
-              ) : (
-                <div className="pt-6 border-t space-y-2">
-                  <Button variant="outline" className="w-full justify-start" asChild>
-                    <Link to="/login" onClick={closeMenu}>
-                      <LogIn className="mr-2 h-4 w-4" />
-                      Login
-                    </Link>
-                  </Button>
-                  <Button variant="default" className="w-full justify-start" asChild>
-                    <Link to="/register" onClick={closeMenu}>
-                      <UserPlus className="mr-2 h-4 w-4" />
-                      Register
-                    </Link>
                   </Button>
                 </div>
               )}

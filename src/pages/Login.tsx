@@ -1,49 +1,54 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Helmet } from "react-helmet";
 import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { LogIn, Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { LogIn, Eye, EyeOff, AlertCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const formSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
 });
 
 const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const { login } = useAuth();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // In a real app, this would be an API call to authenticate the user
-    console.log(values);
+    setLoginError(null);
     
-    // Simulate successful login
-    localStorage.setItem("isLoggedIn", "true");
+    const success = login(values.username, values.password);
     
-    toast({
-      title: "Login successful",
-      description: "Welcome back!",
-    });
-    
-    navigate("/dashboard");
+    if (success) {
+      toast({
+        title: "Login successful",
+        description: "Welcome back!",
+      });
+      
+      navigate("/dashboard");
+    } else {
+      setLoginError("Invalid username or password. Hint: admin/admin");
+    }
   }
 
   return (
@@ -66,19 +71,26 @@ const Login = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-2xl">Login to your account</CardTitle>
-              <CardDescription>Enter your email and password to access your account</CardDescription>
+              <CardDescription>Enter your credentials to access all features</CardDescription>
             </CardHeader>
             <CardContent>
+              {loginError && (
+                <Alert variant="destructive" className="mb-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{loginError}</AlertDescription>
+                </Alert>
+              )}
+              
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                   <FormField
                     control={form.control}
-                    name="email"
+                    name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>Username</FormLabel>
                         <FormControl>
-                          <Input placeholder="your.email@example.com" {...field} />
+                          <Input placeholder="Enter your username" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

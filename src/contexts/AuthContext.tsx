@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 interface AuthContextType {
   isLoggedIn: boolean;
-  login: () => void;
+  login: (username: string, password: string) => boolean;
   logout: () => void;
 }
 
@@ -30,9 +30,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoggedIn(loggedInStatus === 'true');
   }, []);
 
-  const login = () => {
-    localStorage.setItem('isLoggedIn', 'true');
-    setIsLoggedIn(true);
+  const login = (username: string, password: string) => {
+    // Check against hardcoded admin credentials
+    if (username === 'admin' && password === 'admin') {
+      localStorage.setItem('isLoggedIn', 'true');
+      setIsLoggedIn(true);
+      return true;
+    }
+    return false;
   };
 
   const logout = () => {

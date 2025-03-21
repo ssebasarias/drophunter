@@ -13,11 +13,13 @@ import {
   Heart,
   Settings,
   PanelLeft,
-  PanelRightClose
+  PanelRightClose,
+  TrendingUp
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { categories } from "@/lib/data";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 const getCategoryIcon = (id: string) => {
   switch (id) {
@@ -44,9 +46,14 @@ const Sidebar = ({ className }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState(true);
   const location = useLocation();
+  const { isLoggedIn } = useAuth();
   
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
   const toggleCategories = () => setExpandedCategories(!expandedCategories);
+  
+  if (!isLoggedIn) {
+    return null;
+  }
   
   return (
     <aside className={cn(
@@ -79,6 +86,19 @@ const Sidebar = ({ className }: SidebarProps) => {
           >
             <LayoutDashboard className="h-5 w-5 flex-shrink-0" />
             {!isCollapsed && <span>Dashboard</span>}
+          </Link>
+          
+          <Link 
+            to="/trending" 
+            className={cn(
+              "flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
+              location.pathname === "/trending" 
+                ? "bg-primary text-primary-foreground" 
+                : "hover:bg-muted"
+            )}
+          >
+            <TrendingUp className="h-5 w-5 flex-shrink-0" />
+            {!isCollapsed && <span>Trending Products</span>}
           </Link>
           
           <div className="pt-2">
