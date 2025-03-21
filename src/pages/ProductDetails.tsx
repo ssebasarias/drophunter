@@ -10,7 +10,11 @@ import {
   Star,
   Truck,
   Clock,
-  Share2
+  Share2,
+  Users,
+  MapPin,
+  Target,
+  BarChart
 } from "lucide-react";
 import Navbar from "@/components/navigation/Navbar";
 import Sidebar from "@/components/navigation/Sidebar";
@@ -19,14 +23,125 @@ import Chip from "@/components/ui/Chip";
 import { toast } from "@/components/ui/use-toast";
 import { products, userData } from "@/lib/data";
 import { 
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { 
   LineChart, 
   Line, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  ResponsiveContainer 
+  ResponsiveContainer,
+  Area
 } from "recharts";
+
+// Helper function to generate recommendation data based on product category
+const getRecommendationData = (category: string) => {
+  const recommendations = {
+    electronics: {
+      demographics: {
+        age: '18-35',
+        gender: 'Balanced (55% male, 45% female)',
+        interests: 'Technology, Gaming, Social Media',
+        socioeconomic: 'Middle to Upper-middle class'
+      },
+      geographic: {
+        regions: ['Urban centers', 'College towns', 'Tech hubs'],
+        countries: ['United States', 'Japan', 'South Korea', 'Germany', 'United Kingdom'],
+        cities: ['San Francisco', 'Tokyo', 'Seoul', 'Berlin', 'London']
+      },
+      marketingTips: [
+        'Emphasize technological innovation and features',
+        'Use social media platforms for targeted advertising',
+        'Partner with tech influencers for product demonstrations',
+        'Focus on sleek, modern aesthetics in marketing materials'
+      ]
+    },
+    fashion: {
+      demographics: {
+        age: '18-45',
+        gender: 'Female-leaning (70% female, 30% male)',
+        interests: 'Fashion, Social Media, Beauty, Lifestyle',
+        socioeconomic: 'Middle to Upper class'
+      },
+      geographic: {
+        regions: ['Urban areas', 'Fashion-forward cities'],
+        countries: ['United States', 'France', 'Italy', 'United Kingdom', 'Australia'],
+        cities: ['New York', 'Paris', 'Milan', 'London', 'Sydney']
+      },
+      marketingTips: [
+        'Focus on style, quality, and aesthetic appeal',
+        'Use Instagram and Pinterest for visual marketing',
+        'Partner with fashion influencers and bloggers',
+        'Emphasize sustainability and ethical production'
+      ]
+    },
+    home: {
+      demographics: {
+        age: '25-55',
+        gender: 'Balanced (55% female, 45% male)',
+        interests: 'Home Decor, DIY, Interior Design, Sustainability',
+        socioeconomic: 'Middle to Upper-middle class'
+      },
+      geographic: {
+        regions: ['Suburban areas', 'Growing metropolitan regions'],
+        countries: ['United States', 'Canada', 'United Kingdom', 'Germany', 'Australia'],
+        cities: ['Los Angeles', 'Toronto', 'London', 'Berlin', 'Melbourne']
+      },
+      marketingTips: [
+        'Showcase products in styled home environments',
+        'Use Pinterest and home decor blogs for promotion',
+        'Emphasize quality, durability, and aesthetic appeal',
+        'Create content around home organization and styling tips'
+      ]
+    },
+    beauty: {
+      demographics: {
+        age: '18-45',
+        gender: 'Female-dominant (85% female, 15% male)',
+        interests: 'Skincare, Makeup, Self-care, Wellness',
+        socioeconomic: 'Middle to Upper class'
+      },
+      geographic: {
+        regions: ['Urban centers', 'Fashion-forward cities'],
+        countries: ['United States', 'South Korea', 'Japan', 'France', 'United Kingdom'],
+        cities: ['New York', 'Seoul', 'Tokyo', 'Paris', 'London']
+      },
+      marketingTips: [
+        'Focus on benefits, ingredients, and results',
+        'Use before/after content and demonstrations',
+        'Partner with beauty influencers for reviews',
+        'Emphasize self-care and wellness aspects'
+      ]
+    },
+    sports: {
+      demographics: {
+        age: '18-40',
+        gender: 'Male-leaning (60% male, 40% female)',
+        interests: 'Fitness, Outdoor Activities, Health, Athletics',
+        socioeconomic: 'Middle class'
+      },
+      geographic: {
+        regions: ['Urban areas', 'College towns', 'Outdoor recreation hubs'],
+        countries: ['United States', 'Canada', 'Australia', 'Germany', 'United Kingdom'],
+        cities: ['Denver', 'Vancouver', 'Sydney', 'Munich', 'Manchester']
+      },
+      marketingTips: [
+        'Emphasize performance, durability, and functionality',
+        'Use action shots and videos of products in use',
+        'Partner with athletes and fitness influencers',
+        'Focus on health benefits and active lifestyle'
+      ]
+    }
+  };
+  
+  return recommendations[category as keyof typeof recommendations] || recommendations.electronics;
+};
 
 const ProductDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -87,6 +202,29 @@ const ProductDetails = () => {
   
   const profit = price - cost;
   const margin = Math.round((profit / price) * 100);
+  
+  // Get recommendation data based on product category
+  const recommendationData = getRecommendationData(category);
+  
+  // Enhanced performance data with moving average
+  const enhancedPerformanceData = performance.map((item, index) => {
+    // Calculate 3-month moving average if possible
+    let trendValue = item.sales;
+    if (index >= 2) {
+      trendValue = Math.round((performance[index].sales + performance[index-1].sales + performance[index-2].sales) / 3);
+    }
+    
+    return {
+      ...item,
+      trendLine: trendValue
+    };
+  });
+
+  // Get colors for the chart
+  const chartPrimaryColor = "#8B5CF6";
+  const chartSecondaryColor = "#D946EF";
+  const gradientStart = "#8B5CF680";
+  const gradientEnd = "#8B5CF610";
   
   return (
     <>
@@ -219,33 +357,204 @@ const ProductDetails = () => {
             <div className="mt-12 mb-8">
               <h2 className="text-2xl font-medium mb-6">Sales Performance</h2>
               
-              <div className="h-80 rounded-lg border p-4">
+              <div className="h-80 rounded-lg border p-6 bg-background shadow-sm">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
-                    data={performance}
+                    data={enhancedPerformanceData}
                     margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" opacity={0.4} />
+                    <defs>
+                      <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={gradientStart} stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor={gradientEnd} stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <XAxis 
+                      dataKey="month" 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: '#888', fontSize: 12 }}
+                    />
+                    <YAxis 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: '#888', fontSize: 12 }}
+                    />
                     <Tooltip
                       contentStyle={{ 
                         borderRadius: '8px', 
                         border: '1px solid #f0f0f0',
-                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.97)'
                       }}
-                      formatter={(value: number) => [`${value} sales`, 'Sales']}
+                      formatter={(value: number, name: string) => [
+                        `${value} sales`, 
+                        name === 'sales' ? 'Monthly Sales' : 'Trend Line'
+                      ]}
+                      labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="sales"
+                      stroke={chartPrimaryColor}
+                      fillOpacity={1}
+                      fill="url(#colorSales)"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="trendLine"
+                      stroke={chartSecondaryColor}
+                      strokeWidth={2}
+                      dot={{ r: 0 }}
+                      strokeDasharray="5 5"
                     />
                     <Line
                       type="monotone"
                       dataKey="sales"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth={2}
-                      dot={{ r: 4, strokeWidth: 2 }}
-                      activeDot={{ r: 6, strokeWidth: 2 }}
+                      stroke={chartPrimaryColor}
+                      strokeWidth={3}
+                      dot={{ r: 5, strokeWidth: 2, stroke: chartPrimaryColor, fill: "#fff" }}
+                      activeDot={{ r: 7, strokeWidth: 0, fill: chartPrimaryColor }}
                     />
                   </LineChart>
                 </ResponsiveContainer>
+              </div>
+            </div>
+            
+            {/* New Target Audience Recommendations Section */}
+            <div className="mt-12 mb-8">
+              <h2 className="text-2xl font-medium mb-6">Target Audience Recommendations</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Demographic Card */}
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-center">
+                      <Users className="h-5 w-5 mr-2 text-primary" />
+                      Demographic Recommendations
+                    </CardTitle>
+                    <CardDescription>
+                      Ideal customer profile for {name}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex items-center border-b pb-3">
+                        <div className="w-24 font-medium text-sm">Age Range:</div>
+                        <div className="flex-1">{recommendationData.demographics.age}</div>
+                      </div>
+                      <div className="flex items-center border-b pb-3">
+                        <div className="w-24 font-medium text-sm">Gender:</div>
+                        <div className="flex-1">{recommendationData.demographics.gender}</div>
+                      </div>
+                      <div className="flex items-center border-b pb-3">
+                        <div className="w-24 font-medium text-sm">Interests:</div>
+                        <div className="flex-1">{recommendationData.demographics.interests}</div>
+                      </div>
+                      <div className="flex items-center">
+                        <div className="w-24 font-medium text-sm">Income:</div>
+                        <div className="flex-1">{recommendationData.demographics.socioeconomic}</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                {/* Geographic Card */}
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-center">
+                      <MapPin className="h-5 w-5 mr-2 text-primary" />
+                      Geographic Recommendations
+                    </CardTitle>
+                    <CardDescription>
+                      Key markets with highest demand
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="font-medium text-sm mb-2">Top Regions:</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {recommendationData.geographic.regions.map((region, i) => (
+                            <Chip 
+                              key={i} 
+                              label={region} 
+                              variant="outline"
+                              size="sm"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-sm mb-2">Top Countries:</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {recommendationData.geographic.countries.slice(0, 3).map((country, i) => (
+                            <Chip 
+                              key={i} 
+                              label={country} 
+                              variant="primary"
+                              size="sm"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-sm mb-2">Top Cities:</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {recommendationData.geographic.cities.slice(0, 3).map((city, i) => (
+                            <Chip 
+                              key={i} 
+                              label={city}
+                              variant="secondary"
+                              size="sm"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                {/* Marketing Strategy Card */}
+                <Card className="md:col-span-2">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-center">
+                      <Target className="h-5 w-5 mr-2 text-primary" />
+                      Marketing Strategy Recommendations
+                    </CardTitle>
+                    <CardDescription>
+                      Best practices for reaching your target audience
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <h4 className="font-medium mb-3 flex items-center">
+                          <BarChart className="h-4 w-4 mr-2 text-primary" />
+                          Key Marketing Tips
+                        </h4>
+                        <ul className="space-y-2 list-disc pl-5">
+                          {recommendationData.marketingTips.map((tip, i) => (
+                            <li key={i} className="text-muted-foreground">{tip}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="bg-secondary/20 p-4 rounded-lg">
+                        <h4 className="font-medium mb-3">Product-Specific Insights</h4>
+                        <p className="text-muted-foreground mb-3">
+                          This {category} product has shown strong appeal among {recommendationData.demographics.age} year-olds 
+                          with interests in {recommendationData.demographics.interests.split(',')[0]}.
+                        </p>
+                        <p className="text-muted-foreground">
+                          Focus your marketing efforts in {recommendationData.geographic.countries[0]} and 
+                          {recommendationData.geographic.countries[1]}, especially in urban areas with 
+                          {recommendationData.demographics.socioeconomic.toLowerCase()} populations.
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </div>
