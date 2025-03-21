@@ -84,14 +84,21 @@ const Sidebar = ({ className }: SidebarProps) => {
   const sidebarContent = (
     <aside className={cn(
       "border-r bg-card transition-all duration-300 ease-in-out",
-      isMobile ? "h-full w-full" : `h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto ${isCollapsed ? "w-16" : "w-64"}`,
+      isMobile ? "h-full w-full" : `h-[calc(100vh-0rem)] sticky top-0 overflow-y-auto ${isCollapsed ? "w-16" : "w-64"}`,
       className
     )}
     style={mobileStyles}
     >
       <div className="p-4">
         <div className="flex justify-between items-center">
-          {(!isCollapsed || isMobile) && <h3 className="font-medium">Navigation</h3>}
+          {(!isCollapsed || isMobile) && (
+            <Link to="/" className="font-semibold text-xl tracking-tight flex items-center gap-2">
+              <div className="relative w-8 h-8 bg-primary rounded-md flex items-center justify-center">
+                <span className="text-primary-foreground font-bold">D</span>
+              </div>
+              <span>DropHunter</span>
+            </Link>
+          )}
           {!isMobile && (
             <Button
               variant="ghost"
@@ -119,7 +126,7 @@ const Sidebar = ({ className }: SidebarProps) => {
             to="/dashboard" 
             className={cn(
               "flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
-              location.pathname === "/dashboard" || location.pathname.startsWith("/categories/")
+              location.pathname === "/dashboard" 
                 ? "bg-primary text-primary-foreground" 
                 : "hover:bg-muted"
             )}
@@ -127,6 +134,45 @@ const Sidebar = ({ className }: SidebarProps) => {
             <LayoutDashboard className="h-5 w-5 flex-shrink-0" />
             {(!isCollapsed || isMobile) && <span>Dashboard</span>}
           </Link>
+          
+          <div className="pt-2">
+            <button
+              onClick={toggleCategories}
+              className={cn(
+                "flex items-center justify-between w-full px-3 py-2 rounded-md transition-colors hover:bg-muted",
+                expandedCategories && "mb-1"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                {(!isCollapsed || isMobile) && <span className="font-medium">Categories</span>}
+              </div>
+              {(!isCollapsed || isMobile) && (
+                expandedCategories ? 
+                <ChevronDown className="h-4 w-4" /> : 
+                <ChevronRight className="h-4 w-4" />
+              )}
+            </button>
+            
+            {expandedCategories && (!isCollapsed || isMobile) && (
+              <div className="space-y-1 ml-2 pl-2 border-l border-muted">
+                {categories.map(category => (
+                  <Link
+                    key={category.id}
+                    to={`/categories/${category.id}`}
+                    className={cn(
+                      "flex items-center gap-3 px-3 py-2 rounded-md transition-colors text-sm",
+                      location.pathname === `/categories/${category.id}`
+                        ? "bg-primary/10 text-primary"
+                        : "hover:bg-muted"
+                    )}
+                  >
+                    {getCategoryIcon(category.id)}
+                    <span>{category.name}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
           
           <Link 
             to="/trending" 
@@ -181,7 +227,7 @@ const Sidebar = ({ className }: SidebarProps) => {
           variant="ghost"
           size="icon"
           onClick={() => setIsMobileMenuOpen(true)}
-          className="md:hidden fixed top-4 left-4 z-20 h-10 w-10 bg-background"
+          className="fixed top-4 left-4 z-20 h-10 w-10 bg-background"
         >
           <PanelLeft className="h-5 w-5" />
         </Button>
