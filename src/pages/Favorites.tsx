@@ -1,16 +1,23 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { Heart } from "lucide-react";
+import { Navigate, Link } from "react-router-dom";
 import Navbar from "@/components/navigation/Navbar";
 import Sidebar from "@/components/navigation/Sidebar";
 import ProductGrid from "@/components/products/ProductGrid";
 import { Button } from "@/components/ui/button";
 import { products, userData } from "@/lib/data";
-import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Favorites = () => {
+  const { isLoggedIn } = useAuth();
   const [favorites, setFavorites] = useState<string[]>(userData.favorites);
+  
+  // Redirect to login if not logged in
+  if (!isLoggedIn) {
+    return <Navigate to="/login" />;
+  }
   
   const toggleFavorite = (id: string) => {
     setFavorites(favorites.filter(fav => fav !== id));
